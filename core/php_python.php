@@ -6,26 +6,26 @@
 // License: http://www.apache.org/licenses/LICENSE-2.0
 //-----------------------------------------------------------
 
-define("LAJP_IP", "127.0.0.1");     //Python¶ËIP
-define("LAJP_PORT", 10240);         //Python¶ËÕìÌı¶Ë¿Ú
+define("LAJP_IP", "127.0.0.1");     //Pythonç«¯IP
+define("LAJP_PORT", 10240);         //Pythonç«¯ä¾¦å¬ç«¯å£
 
-define("PARAM_TYPE_ERROR", 101);    //²ÎÊıÀàĞÍ´íÎó
-define("SOCKET_ERROR", 102);        //SOCKET´íÎó
-define("LAJP_EXCEPTION", 104);      //Python¶Ë·´À¡Òì³£
+define("PARAM_TYPE_ERROR", 101);    //å‚æ•°ç±»å‹é”™è¯¯
+define("SOCKET_ERROR", 102);        //SOCKETé”™è¯¯
+define("LAJP_EXCEPTION", 104);      //Pythonç«¯åé¦ˆå¼‚å¸¸
 
 function ppython()
 {
-    //²ÎÊıÊıÁ¿
+    //å‚æ•°æ•°é‡
     $args_len = func_num_args();
-    //²ÎÊıÊı×é
+    //å‚æ•°æ•°ç»„
     $arg_array = func_get_args();
 
-    //²ÎÊıÊıÁ¿²»ÄÜĞ¡ÓÚ1
+    //å‚æ•°æ•°é‡ä¸èƒ½å°äº1
     if ($args_len < 1)
     {
         throw new Exception("[PPython Error] lapp_call function's arguments length < 1", PARAM_TYPE_ERROR);
     }
-    //µÚÒ»¸ö²ÎÊıÊÇPythonÄ£¿éº¯ÊıÃû³Æ£¬±ØĞëÊÇstringÀàĞÍ
+    //ç¬¬ä¸€ä¸ªå‚æ•°æ˜¯Pythonæ¨¡å—å‡½æ•°åç§°ï¼Œå¿…é¡»æ˜¯stringç±»å‹
     if (!is_string($arg_array[0]))
     {
         throw new Exception("[PPython Error] lapp_call function's first argument must be string \"module_name::function_name\".", PARAM_TYPE_ERROR);
@@ -42,7 +42,7 @@ function ppython()
         throw new Exception("[PPython Error] socket connect error.", SOCKET_ERROR);
     }
 
-    //ÏûÏ¢ÌåĞòÁĞ»¯
+    //æ¶ˆæ¯ä½“åºåˆ—åŒ–
     $request = serialize($arg_array);
     $req_len = strlen($request);
 
@@ -53,7 +53,7 @@ function ppython()
     $send_len = 0;
     do
     {
-        //·¢ËÍ
+        //å‘é€
         if (($sends = socket_write($socket, $request, strlen($request))) === false)
         {
             throw new Exception("[PPython Error] socket write error.", SOCKET_ERROR);
@@ -64,7 +64,7 @@ function ppython()
 
     }while ($send_len < $req_len);
 
-    //½ÓÊÕ
+    //æ¥æ”¶
     $response = "";
     while(true)
     {
@@ -84,29 +84,29 @@ function ppython()
 
     }
 
-    //¹Ø±Õ
+    //å…³é—­
     socket_close($socket);
 
-    $rsp_stat = substr($response, 0, 1);    //·µ»ØÀàĞÍ "S":³É¹¦ "F":Òì³£
-    $rsp_msg = substr($response, 1);        //·µ»ØĞÅÏ¢
+    $rsp_stat = substr($response, 0, 1);    //è¿”å›ç±»å‹ "S":æˆåŠŸ "F":å¼‚å¸¸
+    $rsp_msg = substr($response, 1);        //è¿”å›ä¿¡æ¯
 
-    //echo "·µ»ØÀàĞÍ:{$rsp_stat},·µ»ØĞÅÏ¢:{$rsp_msg}<br>";
+    //echo "è¿”å›ç±»å‹:{$rsp_stat},è¿”å›ä¿¡æ¯:{$rsp_msg}<br>";
 
     if ($rsp_stat == "F")
     {
-        //Òì³£ĞÅÏ¢²»ÓÃ·´ĞòÁĞ»¯
+        //å¼‚å¸¸ä¿¡æ¯ä¸ç”¨ååºåˆ—åŒ–
         throw new Exception("[PPython Error] Receive Python exception: ".$rsp_msg, LAJP_EXCEPTION);
     }
     else
     {
-        if ($rsp_msg != "N") //·µ»Ø·Çvoid
+        if ($rsp_msg != "N") //è¿”å›évoid
         {
             try {
             if (!unserialize($rsp_msg))
                 if ($rsp_msg)
                     echo "receive ".$rsp_msg."<br/>\r\n";
 
-            //·´ĞòÁĞ»¯
+            //ååºåˆ—åŒ–
             return unserialize($rsp_msg);
             }
             catch (Exception $e){

@@ -66,6 +66,7 @@ if __name__ == '__main__':
     print ("-------------------------------------------")
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  #TCP/IP
+    sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
     sock.bind(('', LISTEN_PORT))  
     sock.listen(5)  
 
