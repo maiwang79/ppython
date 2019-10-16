@@ -190,11 +190,14 @@ class ProcessThread(threading.Thread):
 
         #从消息包中解析出模块名、函数名、入参list
         modul, func, params = parse_php_req(reqMsg)
+        modul = 'mod.' + modul
+
+        callMod = __import__ (modul)
 
         if (modul not in pc_dict):   #预编译字典中没有此编译模块
             #检查模块、函数是否存在
             try:
-                callMod = __import__ (modul)    #根据module名，反射出module
+                callMod = __import__ (modul,fromlist=['blah'])    #根据module名，反射出module
                 pc_dict[modul] = callMod        #预编译字典缓存此模块
             except Exception as e:
                 print ('模块不存在:%s' % modul)
@@ -207,7 +210,7 @@ class ProcessThread(threading.Thread):
         try:
             callMethod = getattr(callMod, func)
         except Exception as e:
-            print ('函数不存在:%s' % func)
+            print ('函数不存在:%s' % func,e)
             self._socket.sendall(("F" + "function '%s()' is not exist!" % func).encode(php_python.CHARSET)) #异常
             self._socket.close()
             return

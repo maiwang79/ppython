@@ -10,7 +10,17 @@ import process
 # -------------------------------------------------
 # 基本配置
 # -------------------------------------------------
-LISTEN_PORT = 10240     #服务侦听端口
+
+CONF={}
+if (os.path.exists('.env')) :
+    with open('.env','r') as f:
+        for line in f.readlines():
+            lineArr = line.split('=')
+            if len(lineArr) > 1:
+                CONF[lineArr[0].strip()] = lineArr[1].strip()
+
+LISTEN_PORT = CONF['PHP_PYTHON_SERVICE_PORT'] if 'PHP_PYTHON_SERVICE_PORT' in CONF else 10240     #服务侦听端口
+
 CHARSET = "utf-8"       #设置字符集（和PHP交互的字符集）
 
 
@@ -41,18 +51,18 @@ CHARSET = "utf-8"       #设置字符集（和PHP交互的字符集）
 #    """释放数据库连接的公共函数"""
 #    pool.release(conn)
 
-import pymysql
+#import pymysql
 
-def getConn() :
-	return pymysql.connect(
-		host='localhost',
-		user='demo',
-		passwd='test',
-		db='ppython',
-		port=3306)
+#def getConn() :
+#	return pymysql.connect(
+#		host='localhost',
+#		user='demo',
+#		passwd='test',
+#		db='ppython',
+#		port=3306)
 
-def closeConn(conn):
-	conn.close();
+#def closeConn(conn):
+#	conn.close();
 
 # -------------------------------------------------
 # 主程序
@@ -66,6 +76,7 @@ if __name__ == '__main__':
     print ("-------------------------------------------")
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  #TCP/IP
+    sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
     sock.bind(('', LISTEN_PORT))  
     sock.listen(5)  
 
