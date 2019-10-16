@@ -19,7 +19,7 @@ if (os.path.exists('.env')) :
             if len(lineArr) > 1:
                 CONF[lineArr[0].strip()] = lineArr[1].strip()
 
-LISTEN_PORT = CONF['PHP_PYTHON_SERVICE_PORT'] if 'PHP_PYTHON_SERVICE_PORT' in CONF else 10240     #服务侦听端口
+LISTEN_PORT = int(CONF['PHP_PYTHON_SERVICE_PORT']) if 'PHP_PYTHON_SERVICE_PORT' in CONF else 10240     #服务侦听端口
 
 CHARSET = "utf-8"       #设置字符集（和PHP交互的字符集）
 
